@@ -242,7 +242,7 @@ class WPSC_REST_API {
 	public function process_query() {
 		global $wp_query;
 
-		// Check for wpec-api var. Get out if not present
+		// Check for wpsc-api var. Get out if not present
 		if ( ! isset( $wp_query->query_vars['wpsc-api'] ) )
 			return;
 
@@ -341,7 +341,7 @@ class WPSC_REST_API {
 			'coupons'
 		) );
 
-		$query = isset( $wp_query->query_vars['wpec-api'] ) ? $wp_query->query_vars['wpec-api'] : null;
+		$query = isset( $wp_query->query_vars['wpsc-api'] ) ? $wp_query->query_vars['wpsc-api'] : null;
 
 		// Make sure our query is valid
 		if ( ! in_array( $query, $accepted ) ) {
