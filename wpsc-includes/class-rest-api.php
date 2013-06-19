@@ -159,7 +159,7 @@ class WPSC_REST_API {
 		$vars[] = 'startdate';
 		$vars[] = 'enddate';
 		$vars[] = 'customer';
-		$vars[] = 'discount';
+		$vars[] = 'coupon';
 		$vars[] = 'format';
 
 		return $vars;
@@ -282,11 +282,11 @@ class WPSC_REST_API {
 
 				break;
 
-			case 'discounts' :
+			case 'coupons' :
 
-				$discount = isset( $wp_query->query_vars['discount'] ) ? $wp_query->query_vars['discount']  : null;
+				$coupon = isset( $wp_query->query_vars['coupon'] ) ? $wp_query->query_vars['coupon']  : null;
 
-				$data = $this->get_discounts( $discount );
+				$data = $this->get_coupons( $coupon );
 
 				break;
 
@@ -338,7 +338,7 @@ class WPSC_REST_API {
 			'products',
 			'customers',
 			'sales',
-			'discounts'
+			'coupons'
 		) );
 
 		$query = isset( $wp_query->query_vars['wpec-api'] ) ? $wp_query->query_vars['wpec-api'] : null;
@@ -1039,73 +1039,73 @@ class WPSC_REST_API {
 	}
 
 	/**
-	 * Process Get Discounts API Request
+	 * Process Get coupons API Request
 	 *
 	 * @access public
 	 * @since 1.6
 	 * @global object $wpdb Used to query the database using the WordPress
 	 *   Database API
-	 * @param int $discount Discount ID
-	 * @return array $discounts Multidimensional array of the discounts
+	 * @param int $coupon coupon ID
+	 * @return array $coupons Multidimensional array of the coupons
 	 */
-	public function get_discounts( $discount = null ) {
+	public function get_coupons( $coupon = null ) {
 
-		if ( empty( $discount ) ) {
+		if ( empty( $coupon ) ) {
 
 			global $wpdb;
 
 			$paged     = $this->get_paged();
 			$per_page  = $this->per_page();
-			$discounts = array(); // TODO - get discount codes
+			$coupons = array(); // TODO - get coupon codes
 			$count     = 0;
 
-			foreach ( $discounts as $discount ) {
+			foreach ( $coupons as $coupon ) {
 
-				$discount_list['discounts'][$count]['ID']                    = '';
-				$discount_list['discounts'][$count]['name']                  = '';
-				$discount_list['discounts'][$count]['code']                  = '';
-				$discount_list['discounts'][$count]['amount']                = '';
-				$discount_list['discounts'][$count]['min_price']             = '';
-				$discount_list['discounts'][$count]['type']                  = '';
-				$discount_list['discounts'][$count]['uses']                  = '';
-				$discount_list['discounts'][$count]['max_uses']              = '';
-				$discount_list['discounts'][$count]['start_date']            = '';
-				$discount_list['discounts'][$count]['exp_date']              = '';
-				$discount_list['discounts'][$count]['status']                = '';
-				$discount_list['discounts'][$count]['conditions']            = '';
-				$discount_list['discounts'][$count]['single_use']            = '';
+				$coupon_list['coupons'][$count]['ID']                    = '';
+				$coupon_list['coupons'][$count]['name']                  = '';
+				$coupon_list['coupons'][$count]['code']                  = '';
+				$coupon_list['coupons'][$count]['amount']                = '';
+				$coupon_list['coupons'][$count]['min_price']             = '';
+				$coupon_list['coupons'][$count]['type']                  = '';
+				$coupon_list['coupons'][$count]['uses']                  = '';
+				$coupon_list['coupons'][$count]['max_uses']              = '';
+				$coupon_list['coupons'][$count]['start_date']            = '';
+				$coupon_list['coupons'][$count]['exp_date']              = '';
+				$coupon_list['coupons'][$count]['status']                = '';
+				$coupon_list['coupons'][$count]['conditions']            = '';
+				$coupon_list['coupons'][$count]['single_use']            = '';
 
 				$count++;
 			}
 
 		} else {
 
-			if ( is_numeric( $discount ) && get_post( $discount ) ) {
+			if ( is_numeric( $coupon ) && get_post( $coupon ) ) {
 
-				$discount_list['discounts'][0]['ID']                         = '';
-				$discount_list['discounts'][0]['name']                       = '';
-				$discount_list['discounts'][0]['code']                       = '';
-				$discount_list['discounts'][0]['amount']                     = '';
-				$discount_list['discounts'][0]['min_price']                  = '';
-				$discount_list['discounts'][0]['type']                       = '';
-				$discount_list['discounts'][0]['uses']                       = '';
-				$discount_list['discounts'][0]['max_uses']                   = '';
-				$discount_list['discounts'][0]['start_date']                 = '';
-				$discount_list['discounts'][0]['exp_date']                   = '';
-				$discount_list['discounts'][0]['status']                     = '';
-				$discount_list['discounts'][0]['conditions']                 = '';
-				$discount_list['discounts'][0]['single_use']                 = '';
+				$coupon_list['coupons'][0]['ID']                         = '';
+				$coupon_list['coupons'][0]['name']                       = '';
+				$coupon_list['coupons'][0]['code']                       = '';
+				$coupon_list['coupons'][0]['amount']                     = '';
+				$coupon_list['coupons'][0]['min_price']                  = '';
+				$coupon_list['coupons'][0]['type']                       = '';
+				$coupon_list['coupons'][0]['uses']                       = '';
+				$coupon_list['coupons'][0]['max_uses']                   = '';
+				$coupon_list['coupons'][0]['start_date']                 = '';
+				$coupon_list['coupons'][0]['exp_date']                   = '';
+				$coupon_list['coupons'][0]['status']                     = '';
+				$coupon_list['coupons'][0]['conditions']                 = '';
+				$coupon_list['coupons'][0]['single_use']                 = '';
 
 			} else {
 
-				$this->errors[] = sprintf( __( 'Discount %s not found!', 'wpsc' ), $discount );
+				$this->errors[] = sprintf( __( 'coupon %s not found!', 'wpsc' ), $coupon );
 				return $error;
 
 			}
 
 		}
 
-		return $discount_list;
+		return $coupon_list;
 	}
 
 
