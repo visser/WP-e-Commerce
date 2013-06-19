@@ -1164,8 +1164,8 @@ class WPSC_REST_API {
 	public function get_output() {
 		if( ! empty( $this->errors ) ) {
 			$this->data = array();
-			foreach( $this->errors as $error ) {
-				$this->data['errors'][] = $error;
+			foreach( $this->errors as $error_id => $error ) {
+				$this->data['errors'][ $error_id ] = $error;
 			}
 		}
 		return $this->data;
