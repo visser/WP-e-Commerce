@@ -33,6 +33,12 @@ class WPSC_REST_API {
 	const VERSION = '1.0';
 
 	/**
+	 * @var WPSC_REST_API The one true WPSC_REST_API
+	 * @since 3.9
+	 */
+	private static $instance;
+
+	/**
 	 * Pretty Print?
 	 *
 	 * @var bool
@@ -78,13 +84,31 @@ class WPSC_REST_API {
 	private $data = array();
 
 	/**
+	 * Main WPSC_REST_API Instance
+	 *
+	 * Insures that only one instance of WPSC_REST_API exists in memory at any one
+	 * time.
+	 *
+	 * @var object
+	 * @access public
+	 * @since 3.9
+	 */
+	public static function get_instance() {
+		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof WPSC_REST_API ) ) {
+			self::$instance = new WPSC_REST_API;
+			self::$instance->init();
+		}
+		return self::$instance;
+	}
+
+	/**
 	 * Setup the EDD API
 	 *
 	 * @access public
 	 * @since 3.9
 	 * @return void
 	 */
-	public function __construct() {
+	public function init() {
 		add_action( 'init',                    array( $this, 'add_endpoint'   ) );
       	add_action( 'template_redirect',       array( $this, 'process_query'  ), -1 );
 		add_filter( 'query_vars',              array( $this, 'query_vars'     ) );
@@ -1297,3 +1321,4 @@ class WPSC_REST_API {
 		}
 	}
 }
+add_action( 'wpsc_init', array( 'WPSC_REST_API', 'get_instance' ) );
