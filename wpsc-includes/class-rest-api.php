@@ -19,13 +19,13 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * WPEC_API Class
+ * WPSC_API Class
  *
  * Renders API returns as a JSON/XML array
  *
  * @since  3.9
  */
-class WPEC_REST_API {
+class WPSC_REST_API {
 
 	/**
 	 * API version
