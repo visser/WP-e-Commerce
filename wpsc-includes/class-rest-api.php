@@ -424,7 +424,7 @@ class WPSC_REST_API {
 
 		$args = wp_parse_args( $args, $defaults );
 
-		date_default_timezone_set( wpsc_get_timezone_id() );
+		date_default_timezone_set( get_option( 'timezone_string' ) );
 
 		if ( 'range' === $args['date'] ) {
 			$startdate          = strtotime( $args['startdate'] );
