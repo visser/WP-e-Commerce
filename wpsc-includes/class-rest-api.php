@@ -178,41 +178,7 @@ class WPSC_REST_API {
 		if ( empty( $wp_query->query_vars['token'] ) || empty( $wp_query->query_vars['key'] ) )
 			$this->missing_auth();
 
-		// Retrieve the user by public API key and ensure they exist
-		if ( ! ( $user = $this->get_user( $wp_query->query_vars['key'] ) ) ) :
-			$this->invalid_key( $wp_query->query_vars['key'] );
-		else :
-			$token  = urldecode( $wp_query->query_vars['token'] );
-			$secret = get_user_meta( $user, 'wpsc_user_secret_key', true );
-			$public = urldecode( $wp_query->query_vars['key'] );
-
-			if ( hash( 'md5', $secret . $public ) === $token )
-				$this->is_valid_request = true;
-			else
-				$this->invalid_auth();
-		endif;
-	}
-
-	/**
-	 * Retrieve the user ID based on the public key provided
-	 *
-	 * @access public
-	 * @since 3.9
-	 * @global object $wpdb Used to query the database using the WordPress
-	 *   Database API
-	 * @param int $key Public Key
-	 * @return mixed string if user ID is found, false otherwise
-	 */
-	public function get_user( $key = '' ) {
-		global $wpdb;
-
-		$user = $wpdb->get_var( $wpdb->prepare( "SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'wpsc_user_public_key' AND meta_value = %s LIMIT 1", $key ) );
-
-		if ( $user != NULL ) {
-			$this->user_id = $user;
-			return $user;
-		}
-		return false;
+		// TODO validate request
 	}
 
 	/**
