@@ -181,12 +181,14 @@ class WPSC_REST_API {
 	private function validate_request() {
 		global $wp_query;
 
-		return; // TODO - remove once actual keys are implemented
 
 		// Make sure we have both user and api key
 		if ( empty( $wp_query->query_vars['token'] ) || empty( $wp_query->query_vars['key'] ) )
 			$this->missing_auth();
 
+
+
+		return; // TODO - remove once actual keys are implemented
 		// TODO validate request
 	}
 
@@ -248,8 +250,8 @@ class WPSC_REST_API {
 		$this->validate_request();
 
 		// Only proceed if no errors have been noted
-		if( ! $this->is_valid_request )
-			return;
+		if( ! empty( $this->errors ) )
+			$this->output();
 
 		// Determine the kind of query
 		$query_mode = $this->get_query_mode();
@@ -257,18 +259,6 @@ class WPSC_REST_API {
 		$data = array();
 
 		switch( $query_mode ) :
-
-			case 'stats' :
-
-				$data = $this->get_stats( array(
-					'type'      => isset( $wp_query->query_vars['type'] )      ? $wp_query->query_vars['type']      : null,
-					'product'   => isset( $wp_query->query_vars['product'] )   ? $wp_query->query_vars['product']   : null,
-					'date'      => isset( $wp_query->query_vars['date'] )      ? $wp_query->query_vars['date']      : null,
-					'startdate' => isset( $wp_query->query_vars['startdate'] ) ? $wp_query->query_vars['startdate'] : null,
-					'enddate'   => isset( $wp_query->query_vars['enddate'] )   ? $wp_query->query_vars['enddate']   : null
-				) );
-
-				break;
 
 			case 'products' :
 
@@ -297,6 +287,19 @@ class WPSC_REST_API {
 				$discount = isset( $wp_query->query_vars['discount'] ) ? $wp_query->query_vars['discount']  : null;
 
 				$data = $this->get_discounts( $discount );
+
+				break;
+
+			case 'stats' :
+			default :
+
+				$data = $this->get_stats( array(
+					'type'      => isset( $wp_query->query_vars['type'] )      ? $wp_query->query_vars['type']      : null,
+					'product'   => isset( $wp_query->query_vars['product'] )   ? $wp_query->query_vars['product']   : null,
+					'date'      => isset( $wp_query->query_vars['date'] )      ? $wp_query->query_vars['date']      : null,
+					'startdate' => isset( $wp_query->query_vars['startdate'] ) ? $wp_query->query_vars['startdate'] : null,
+					'enddate'   => isset( $wp_query->query_vars['enddate'] )   ? $wp_query->query_vars['enddate']   : null
+				) );
 
 				break;
 
