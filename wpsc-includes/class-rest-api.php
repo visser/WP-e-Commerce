@@ -679,6 +679,7 @@ class WPSC_REST_API {
 
 		if( ! empty( $product ) ) {
 
+			// Retrieve the specified product
 			$p = get_post( $product );
 
 			// No product found
@@ -700,6 +701,7 @@ class WPSC_REST_API {
 
 		} else {
 
+			// Query multiple products
 			$product_query = get_posts( array(
 				'post_type'      => 'wpsc-product',
 				'posts_per_page' => $this->per_page(),
@@ -731,17 +733,14 @@ class WPSC_REST_API {
 				$products['products'][$i]['info']['thumbnail']                    = wp_get_attachment_url( get_post_thumbnail_id( $product_info->ID ) );
 				$products['products'][$i]['info']['tags']                         = array();
 				$products['products'][$i]['info']['categories']                   = array();
-				$products['products'][$i]['stats']['total']['stock']              = 0;
-				$products['products'][$i]['stats']['total']['sku']                = 0;
-				$products['products'][$i]['stats']['total']['taxable_amount']     = 0;
-				$products['products'][$i]['stats']['total']['external_link']      = array(
+				$products['products'][$i]['info']['stock']              = 0;
+				$products['products'][$i]['info']['sku']                = 0;
+				$products['products'][$i]['info']['taxable_amount']     = 0;
+				$products['products'][$i]['info']['external_link']      = array(
 					'url'    => '',
 					'text'   => '',
 					'target' => ''
 				);
-				$products['products'][$i]['stats']['total']['earnings']           = 0;
-				$products['products'][$i]['stats']['monthly_average']['sales']    = 0;
-				$products['products'][$i]['stats']['monthly_average']['earnings'] = 0;
 
 				$products['products'][$i]['info']['featured_image']               = wp_get_attachment_url( get_post_thumbnail_id( $product_info->ID ) );
 				/*
@@ -776,6 +775,11 @@ class WPSC_REST_API {
 				 *
 				 * Retrieve custom meta fields here
 				 */
+
+
+				$products['products'][$i]['stats']['total']['earnings']           = 0;
+				$products['products'][$i]['stats']['monthly_average']['sales']    = 0;
+				$products['products'][$i]['stats']['monthly_average']['earnings'] = 0;
 
 				$i++;
 			}
