@@ -311,7 +311,7 @@ class WPSC_REST_API {
 			$this->log_request( $this->data );
 
 		} else {
-			$this->data = $this->errors;
+			$data = $this->errors;
 		}
 
 		// Allow extensions to setup their own return data
