@@ -130,7 +130,7 @@ class WPSC_REST_API {
 	 * @since 3.9
 	 */
 	public function add_endpoint( $rewrite_rules ) {
-		add_rewrite_endpoint( 'wpec-api', EP_ALL );
+		add_rewrite_endpoint( 'wpsc-api', EP_ALL );
 	}
 
 	/**
