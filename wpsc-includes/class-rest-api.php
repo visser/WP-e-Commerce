@@ -292,7 +292,6 @@ class WPSC_REST_API {
 
 			case 'stats' :
 			default :
-
 				$data = $this->get_stats( array(
 					'type'      => ! empty( $wp_query->query_vars['type'] )      ? $wp_query->query_vars['type']      : null,
 					'product'   => ! empty( $wp_query->query_vars['product'] )   ? $wp_query->query_vars['product']   : null,
@@ -307,11 +306,13 @@ class WPSC_REST_API {
 
 		if( ! empty( $this->errors ) ) {
 
-			// Log this API request, if enabled. We log it here because we have access to errors.
-			$this->log_request( $this->data );
+			$data = $this->errors;
 
 		} else {
-			$data = $this->errors;
+
+			// Log this API request, if enabled. We log it here because we have access to errors.
+			//$this->log_request( $this->data );
+
 		}
 
 		// Allow extensions to setup their own return data
