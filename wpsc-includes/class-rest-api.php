@@ -119,7 +119,7 @@ class WPSC_REST_API {
 		$this->pretty_print = defined( 'JSON_PRETTY_PRINT' ) ? JSON_PRETTY_PRINT : null;
 
 		// Allow API request logging to be turned off
-		$this->log_requests = apply_filters( 'wpec_api_log_requests', $this->log_requests );
+		$this->log_requests = apply_filters( 'wpsc_api_log_requests', $this->log_requests );
 	}
 
 	/**
@@ -165,9 +165,9 @@ class WPSC_REST_API {
 	 *
 	 * @access private
 	 * @global object $wp_query WordPress Query
-	 * @uses wpec_API::get_user()
-	 * @uses wpec_API::invalid_key()
-	 * @uses wpec_API::invalid_auth()
+	 * @uses wpsc_API::get_user()
+	 * @uses wpsc_API::invalid_key()
+	 * @uses wpsc_API::invalid_auth()
 	 * @since 3.9
 	 * @return void
 	 */
@@ -185,7 +185,7 @@ class WPSC_REST_API {
 			$this->invalid_key( $wp_query->query_vars['key'] );
 		else :
 			$token  = urldecode( $wp_query->query_vars['token'] );
-			$secret = get_user_meta( $user, 'wpec_user_secret_key', true );
+			$secret = get_user_meta( $user, 'wpsc_user_secret_key', true );
 			$public = urldecode( $wp_query->query_vars['key'] );
 
 			if ( hash( 'md5', $secret . $public ) === $token )
@@ -208,7 +208,7 @@ class WPSC_REST_API {
 	public function get_user( $key = '' ) {
 		global $wpdb;
 
-		$user = $wpdb->get_var( $wpdb->prepare( "SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'wpec_user_public_key' AND meta_value = %s LIMIT 1", $key ) );
+		$user = $wpdb->get_var( $wpdb->prepare( "SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'wpsc_user_public_key' AND meta_value = %s LIMIT 1", $key ) );
 
 		if ( $user != NULL ) {
 			$this->user_id = $user;
@@ -222,7 +222,7 @@ class WPSC_REST_API {
 	 * provided
 	 *
 	 * @access public
-	 * @uses wpec_API::output()
+	 * @uses wpsc_API::output()
 	 * @since 3.9
 	 */
 	public function missing_auth() {
@@ -238,7 +238,7 @@ class WPSC_REST_API {
 	 *
 	 * @access public
 	 * @since  3.9
-	 * @uses wpec_API::output()
+	 * @uses wpsc_API::output()
 	 * @return void
 	 */
 	function invalid_auth() {
@@ -254,7 +254,7 @@ class WPSC_REST_API {
 	 *
 	 * @access public
 	 * @since 3.9
-	 * @uses wpec_API::output()
+	 * @uses wpsc_API::output()
 	 * @return void
 	 */
 	function invalid_key() {
@@ -339,7 +339,7 @@ class WPSC_REST_API {
 		endswitch;
 
 		// Allow extensions to setup their own return data
-		$this->data = apply_filters( 'wpec_api_output_data', $data, $query_mode, $this );
+		$this->data = apply_filters( 'wpsc_api_output_data', $data, $query_mode, $this );
 
 		// Log this API request, if enabled. We log it here because we have access to errors.
 		$this->log_request( $this->data );
@@ -360,7 +360,7 @@ class WPSC_REST_API {
 		global $wp_query;
 
 		// Whitelist our query options
-		$accepted = apply_filters( 'wpec_api_valid_query_modes', array(
+		$accepted = apply_filters( 'wpsc_api_valid_query_modes', array(
 			'stats',
 			'products',
 			'customers',
@@ -412,7 +412,7 @@ class WPSC_REST_API {
 		if( $per_page < 0 && $this->get_query_mode() == 'customers' )
 			$per_page = 99999999; // Customers query doesn't support -1
 
-		return apply_filters( 'wpec_api_results_per_page', $per_page );
+		return apply_filters( 'wpsc_api_results_per_page', $per_page );
 	}
 
 	/**
@@ -430,7 +430,7 @@ class WPSC_REST_API {
 
 		$format = isset( $wp_query->query_vars['format'] ) ? $wp_query->query_vars['format'] : 'json';
 
-		return apply_filters( 'wpec_api_output_format', $format );
+		return apply_filters( 'wpsc_api_output_format', $format );
 	}
 
 	/**
@@ -454,7 +454,7 @@ class WPSC_REST_API {
 
 		$args = wp_parse_args( $args, $defaults );
 
-		date_default_timezone_set( wpec_get_timezone_id() );
+		date_default_timezone_set( wpsc_get_timezone_id() );
 
 		if ( 'range' === $args['date'] ) {
 			$startdate          = strtotime( $args['startdate'] );
@@ -581,7 +581,7 @@ class WPSC_REST_API {
 			endswitch;
 		}
 
-		return apply_filters( 'wpec_api_stat_dates', $dates );
+		return apply_filters( 'wpsc_api_stat_dates', $dates );
 	}
 
 	/**
@@ -639,7 +639,7 @@ class WPSC_REST_API {
 			$paged    = $this->get_paged();
 			$per_page = $this->per_page();
 			$offset   = $per_page * ( $paged - 1 );
-			$customer_list_query = $wpdb->get_col( "SELECT DISTINCT meta_value FROM $wpdb->postmeta where meta_key = '_wpec_payment_user_email' ORDER BY meta_id DESC LIMIT $per_page OFFSET $offset" );
+			$customer_list_query = $wpdb->get_col( "SELECT DISTINCT meta_value FROM $wpdb->postmeta where meta_key = '_wpsc_payment_user_email' ORDER BY meta_id DESC LIMIT $per_page OFFSET $offset" );
 			$customer_count = 0;
 
 			foreach ( $customer_list_query as $customer_email ) {
@@ -675,7 +675,7 @@ class WPSC_REST_API {
 				$customer_info = get_user_by( 'email', $customer );
 			}
 
-			if ( $customer_info && wpec_has_purchases( $customer_info->ID ) ) {
+			if ( $customer_info && wpsc_has_purchases( $customer_info->ID ) ) {
 				$customers['customers'][0]['info']['id']               = $customer_info->ID;
 				$customers['customers'][0]['info']['username']         = $customer_info->user_login;
 				$customers['customers'][0]['info']['display_name']     = $customer_info->display_name;
@@ -764,10 +764,10 @@ class WPSC_REST_API {
 				$products['products'][0]['info']['content']                      = $product_info->post_content;
 				$products['products'][0]['info']['thumbnail']                    = wp_get_attachment_url( get_post_thumbnail_id( $product_info->ID ) );
 
-				$products['products'][0]['stats']['total']['sales']              = wpec_get_download_sales_stats( $product_info->ID );
-				$products['products'][0]['stats']['total']['earnings']           = wpec_get_download_earnings_stats( $product_info->ID );
-				$products['products'][0]['stats']['monthly_average']['sales']    = wpec_get_average_monthly_download_sales( $product_info->ID );
-				$products['products'][0]['stats']['monthly_average']['earnings'] = wpec_get_average_monthly_download_earnings( $product_info->ID );
+				$products['products'][0]['stats']['total']['sales']              = wpsc_get_download_sales_stats( $product_info->ID );
+				$products['products'][0]['stats']['total']['earnings']           = wpsc_get_download_earnings_stats( $product_info->ID );
+				$products['products'][0]['stats']['monthly_average']['sales']    = wpsc_get_average_monthly_download_sales( $product_info->ID );
+				$products['products'][0]['stats']['monthly_average']['earnings'] = wpsc_get_average_monthly_download_earnings( $product_info->ID );
 
 				/*
 				 * TODO
@@ -846,7 +846,7 @@ class WPSC_REST_API {
 							$days_in_month = cal_days_in_month( CAL_GREGORIAN, $month, $year );
 
 							while( $day <= $days_in_month ) :
-								$sale_count = 0; // TODO - get sales by date, something like wpec_get_sales_by_date( $day, $month, $year );
+								$sale_count = 0; // TODO - get sales by date, something like wpsc_get_sales_by_date( $day, $month, $year );
 								$sales['sales'][ date( 'Ymd', strtotime( $year . '/' . $month . '/' . $day ) ) ] = $sale_count;
 								$total += $sale_count;
 
@@ -868,13 +868,13 @@ class WPSC_REST_API {
 						$month = $dates['m_start'];
 
 						while( $month <= $dates['m_end'] ) :
-							$sales_count += 0; // TODO - get sales by date, something like wpec_get_sales_by_date( $day, $month, $year );
+							$sales_count += 0; // TODO - get sales by date, something like wpsc_get_sales_by_date( $day, $month, $year );
 							$month++;
 						endwhile;
 
 						$sales['sales'][ $args['date'] ] = $sales_count;
    					} else {
-						$sales['sales'][ $args['date'] ] = 0; // TODO - get sales by date, something like wpec_get_sales_by_date( $day, $month, $year );
+						$sales['sales'][ $args['date'] ] = 0; // TODO - get sales by date, something like wpsc_get_sales_by_date( $day, $month, $year );
    					}
 				}
 			} elseif ( $args['product'] == 'all' ) {
@@ -882,7 +882,7 @@ class WPSC_REST_API {
 				$i = 0;
 				foreach ( $products as $product_info ) {
 					$sales['sales'][$i] = array(
-						$product_info->post_name => 0 // TODO - get sales by date, something like wpec_get_product_sales_stats( $args['product'] )
+						$product_info->post_name => 0 // TODO - get sales by date, something like wpsc_get_product_sales_stats( $args['product'] )
 					);
 					$i++;
 				}
@@ -890,7 +890,7 @@ class WPSC_REST_API {
 				if ( get_post_type( $args['product'] ) == 'wpsc-product' ) {
 					$product_info = get_post( $args['product'] );
 					$sales['sales'][0] = array(
-						$product_info->post_name => 0 // TODO get sale stats for product, something like wpec_get_product_sales_stats( $args['product'] )
+						$product_info->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_sales_stats( $args['product'] )
 					);
 				} else {
 					$error['error'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
@@ -937,7 +937,7 @@ class WPSC_REST_API {
 							$days_in_month = cal_days_in_month( CAL_GREGORIAN, $month, $year );
 
 							while( $day <= $days_in_month ) :
-								$sale_count = 0; // TODO something like wpec_get_earnings_by_date( $day, $month, $year );
+								$sale_count = 0; // TODO something like wpsc_get_earnings_by_date( $day, $month, $year );
 								$earnings['earnings'][ date( 'Ymd', strtotime( $year . '/' . $month . '/' . $day ) ) ] = $sale_count;
 								$total += $sale_count;
 
@@ -959,13 +959,13 @@ class WPSC_REST_API {
 						$month = $dates['m_start'];
 
 						while ( $month <= $dates['m_end'] ) :
-							$earnings_count += 0; // TODO something like wpec_get_earnings_by_date( $day, $month, $year );
+							$earnings_count += 0; // TODO something like wpsc_get_earnings_by_date( $day, $month, $year );
 							$month++;
 						endwhile;
 
 						$earnings['earnings'][ $args['date'] ] = $earnings_count;
    					} else {
-						$earnings['earnings'][ $args['date'] ] = 0; // TODO something like wpec_get_earnings_by_date( $day, $month, $year );
+						$earnings['earnings'][ $args['date'] ] = 0; // TODO something like wpsc_get_earnings_by_date( $day, $month, $year );
    					}
 				}
 			} elseif ( $args['product'] == 'all' ) {
@@ -974,7 +974,7 @@ class WPSC_REST_API {
 				$i = 0;
 				foreach ( $products as $product_info ) {
 					$earnings['earnings'][ $i ] = array(
-						$product_info->post_name => 0 // TODO get sale stats for product, something like wpec_get_product_earnings_stats( $args['product'] )
+						$product_info->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_earnings_stats( $args['product'] )
 					);
 					$i++;
 				}
@@ -982,7 +982,7 @@ class WPSC_REST_API {
 				if ( get_post_type( $args['product'] ) == 'download' ) {
 					$product_info = get_post( $args['product'] );
 					$earnings['earnings'][0] = array(
-						$product_info->post_name => 0 // TODO get sale stats for product, something like wpec_get_product_earnings_stats( $args['product'] )
+						$product_info->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_earnings_stats( $args['product'] )
 					);
 				} else {
 					$error['error'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
@@ -1001,7 +1001,7 @@ class WPSC_REST_API {
 			$stats = array();
 
 			//
-			$count = $wpdb->get_col( "SELECT COUNT(DISTINCT meta_value) FROM $wpdb->postmeta WHERE meta_key = '_wpec_payment_user_email'" );
+			$count = $wpdb->get_col( "SELECT COUNT(DISTINCT meta_value) FROM $wpdb->postmeta WHERE meta_key = '_wpsc_payment_user_email'" );
 
 			$stats['customers']['total_customers'] = $count[0];
 
@@ -1031,7 +1031,7 @@ class WPSC_REST_API {
 		$query = array();
 
 		/* Example:
-		$query = wpec_get_payments( array(
+		$query = wpsc_get_payments( array(
 			'number' => $this->per_page(),
 			'page'   => $this->get_paged(),
 			'status' => 'publish'
@@ -1146,7 +1146,7 @@ class WPSC_REST_API {
 	 *
 	 * @access private
 	 * @since  3.9
-	 * @global $wpec_logs
+	 * @global $wpsc_logs
 	 * @global $wp_query
 	 * @param array $data
 	 * @return void
@@ -1156,7 +1156,7 @@ class WPSC_REST_API {
 		if ( ! $this->log_requests )
 			return;
 
-		global $wpec_logs, $wp_query;
+		global $wpsc_logs, $wp_query;
 
 		$query = array(
 			'key'       => $wp_query->query_vars['key'],
@@ -1176,13 +1176,13 @@ class WPSC_REST_API {
 		);
 
 		$log_meta = array(
-			'request_ip' => wpec_get_ip(),
+			'request_ip' => wpsc_get_ip(),
 			'user'       => $this->user_id,
 			'key'        => $wp_query->query_vars['key']
 		);
 
 		// TODO - implement once WPEC logging system is built
-		//$wpec_logs->insert_log( $log_data, $log_meta );
+		//$wpsc_logs->insert_log( $log_data, $log_meta );
 	}
 
 
@@ -1215,7 +1215,7 @@ class WPSC_REST_API {
 
 		$format = $this->get_output_format();
 
-		do_action( 'wpec_api_output_before', $data, $this, $format );
+		do_action( 'wpsc_api_output_before', $data, $this, $format );
 
 		switch( $format ) :
 
@@ -1241,15 +1241,15 @@ class WPSC_REST_API {
 			default :
 
 				// Allow other formats to be added via extensions
-				do_action( 'wpec_api_output_' . $format, $data, $this );
+				do_action( 'wpsc_api_output_' . $format, $data, $this );
 
 				break;
 
 		endswitch;
 
-		do_action( 'wpec_api_output_after', $data, $this, $format );
+		do_action( 'wpsc_api_output_after', $data, $this, $format );
 
-		wpec_die();
+		die();
 	}
 
 	/**
@@ -1259,31 +1259,31 @@ class WPSC_REST_API {
 	 *
 	 * @access public
 	 * @since 3.9
-	 * @global $wpec_options Array of all the EDD Options
+	 * @global $wpsc_options Array of all the EDD Options
 	 * @param object $user Current user info
 	 * @return void
 	 */
 	function user_key_field( $user ) {
-		global $wpec_options;
+		global $wpsc_options;
 
-		if ( ( isset( $wpec_options['api_allow_user_keys'] ) || current_user_can( 'manage_shop_settings' ) ) && current_user_can( 'view_shop_reports' ) ) {
+		if ( ( isset( $wpsc_options['api_allow_user_keys'] ) || current_user_can( 'manage_shop_settings' ) ) && current_user_can( 'view_shop_reports' ) ) {
 			$user = get_userdata( $user->ID );
 			?>
 			<table class="form-table">
 				<tbody>
 					<tr>
 						<th>
-							<label for="wpec_set_api_key"><?php _e( 'WP e-Commerce API Keys', 'wpsc' ); ?></label>
+							<label for="wpsc_set_api_key"><?php _e( 'WP e-Commerce API Keys', 'wpsc' ); ?></label>
 						</th>
 						<td>
-							<?php if ( empty( $user->wpec_user_public_key ) ) { ?>
-							<input name="wpec_set_api_key" type="checkbox" id="wpec_set_api_key" value="0" />
+							<?php if ( empty( $user->wpsc_user_public_key ) ) { ?>
+							<input name="wpsc_set_api_key" type="checkbox" id="wpsc_set_api_key" value="0" />
 							<span class="description"><?php _e( 'Generate API Key', 'wpsc' ); ?></span>
 							<?php } else { ?>
-								<strong><?php _e( 'Public key:', 'wpsc' ); ?>&nbsp;</strong><span id="publickey"><?php echo $user->wpec_user_public_key; ?></span><br/>
-								<strong><?php _e( 'Secret key:', 'wpsc' ); ?>&nbsp;</strong><span id="privatekey"><?php echo $user->wpec_user_secret_key; ?></span><br/>
-								<strong><?php _e( 'Token:', 'wpsc' ); ?>&nbsp;</strong><span id="token"><?php echo hash( 'md5', $user->wpec_user_secret_key . $user->wpec_user_public_key ); ?></span><br/>
-								<input name="wpec_set_api_key" type="checkbox" id="wpec_set_api_key" value="0" />
+								<strong><?php _e( 'Public key:', 'wpsc' ); ?>&nbsp;</strong><span id="publickey"><?php echo $user->wpsc_user_public_key; ?></span><br/>
+								<strong><?php _e( 'Secret key:', 'wpsc' ); ?>&nbsp;</strong><span id="privatekey"><?php echo $user->wpsc_user_secret_key; ?></span><br/>
+								<strong><?php _e( 'Token:', 'wpsc' ); ?>&nbsp;</strong><span id="token"><?php echo hash( 'md5', $user->wpsc_user_secret_key . $user->wpsc_user_public_key ); ?></span><br/>
+								<input name="wpsc_set_api_key" type="checkbox" id="wpsc_set_api_key" value="0" />
 								<span class="description"><?php _e( 'Revoke API Keys', 'wpsc' ); ?></span>
 							<?php } ?>
 						</td>
@@ -1304,21 +1304,21 @@ class WPSC_REST_API {
 	 * @return void
 	 */
 	public function update_key( $user_id ) {
-		if ( current_user_can( 'edit_user', $user_id ) && isset( $_POST['wpec_set_api_key'] ) ) {
+		if ( current_user_can( 'edit_user', $user_id ) && isset( $_POST['wpsc_set_api_key'] ) ) {
 			$user = get_userdata( $user_id );
 
-			if ( empty( $user->wpec_user_public_key ) ) {
+			if ( empty( $user->wpsc_user_public_key ) ) {
 				$public = hash( 'md5', $user->user_email . date( 'U' ) );
-				update_user_meta( $user_id, 'wpec_user_public_key', $public );
+				update_user_meta( $user_id, 'wpsc_user_public_key', $public );
 			} else {
-				delete_user_meta( $user_id, 'wpec_user_public_key' );
+				delete_user_meta( $user_id, 'wpsc_user_public_key' );
 			}
 
-			if ( empty( $user->wpec_user_secret_key ) ) {
+			if ( empty( $user->wpsc_user_secret_key ) ) {
 				$secret = hash( 'md5', $user->ID . date( 'U' ) );
-				update_user_meta( $user_id, 'wpec_user_secret_key', $secret );
+				update_user_meta( $user_id, 'wpsc_user_secret_key', $secret );
 			} else {
-				delete_user_meta( $user_id, 'wpec_user_secret_key' );
+				delete_user_meta( $user_id, 'wpsc_user_secret_key' );
 			}
 		}
 	}
