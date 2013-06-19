@@ -341,7 +341,7 @@ class WPSC_REST_API {
 			'coupons'
 		) );
 
-		$query = isset( $wp_query->query_vars['wpsc-api'] ) ? $wp_query->query_vars['wpsc-api'] : null;
+		$query = ! empty( $wp_query->query_vars['wpsc-api'] ) ? $wp_query->query_vars['wpsc-api'] : 'stats';
 
 		// Make sure our query is valid
 		if ( ! in_array( $query, $accepted ) ) {
