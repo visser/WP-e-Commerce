@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @since  3.9
  */
-class WPEC_API {
+class WPEC_REST_API {
 
 	/**
 	 * API version
@@ -556,6 +556,44 @@ class WPEC_API {
 		}
 
 		return apply_filters( 'wpec_api_stat_dates', $dates );
+	}
+
+	/**
+	 * Generate the default sales stats returned by the 'stats' endpoint
+	 *
+	 * @access private
+	 * @since 3.9
+	 * @return array default sales statistics
+	 */
+	private function get_default_sales_stats() {
+		// Default sales return
+		$previous_month = date( 'n' ) == 1 ? 12 : date( 'n' ) - 1;
+		$previous_year  = date( 'n' ) == 1 ? date( 'Y' ) - 1 : date( 'Y' );
+
+		$sales['sales']['current_month'] = 0;
+		$sales['sales']['last_month']    = 0;
+		$sales['sales']['totals']        = 0;
+
+		return $sales;
+	}
+
+	/**
+	 * Generate the default earnings stats returned by the 'stats' endpoint
+	 *
+	 * @access private
+	 * @since 3.9
+	 * @return array default earnings statistics
+	 */
+	private function get_default_earnings_stats() {
+		// Default earnings return
+		$previous_month = date( 'n' ) == 1 ? 12 : date( 'n' ) - 1;
+		$previous_year  = date( 'n' ) == 1 ? date( 'Y' ) - 1 : date( 'Y' );
+
+		$earnings['earnings']['current_month'] = 0;
+		$earnings['earnings']['last_month']    = 0;
+		$earnings['earnings']['totals']        = 0;
+
+		return $earnings;
 	}
 
 	/**
@@ -1257,43 +1295,5 @@ class WPEC_API {
 				delete_user_meta( $user_id, 'wpec_user_secret_key' );
 			}
 		}
-	}
-
-	/**
-	 * Generate the default sales stats returned by the 'stats' endpoint
-	 *
-	 * @access private
-	 * @since 3.9
-	 * @return array default sales statistics
-	 */
-	private function get_default_sales_stats() {
-		// Default sales return
-		$previous_month = date( 'n' ) == 1 ? 12 : date( 'n' ) - 1;
-		$previous_year  = date( 'n' ) == 1 ? date( 'Y' ) - 1 : date( 'Y' );
-
-		$sales['sales']['current_month'] = 0;
-		$sales['sales']['last_month']    = 0;
-		$sales['sales']['totals']        = 0;
-
-		return $sales;
-	}
-
-	/**
-	 * Generate the default earnings stats returned by the 'stats' endpoint
-	 *
-	 * @access private
-	 * @since 3.9
-	 * @return array default earnings statistics
-	 */
-	private function get_default_earnings_stats() {
-		// Default earnings return
-		$previous_month = date( 'n' ) == 1 ? 12 : date( 'n' ) - 1;
-		$previous_year  = date( 'n' ) == 1 ? date( 'Y' ) - 1 : date( 'Y' );
-
-		$earnings['earnings']['current_month'] = 0;
-		$earnings['earnings']['last_month']    = 0;
-		$earnings['earnings']['totals']        = 0;
-
-		return $earnings;
 	}
 }
