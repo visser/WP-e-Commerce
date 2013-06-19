@@ -75,6 +75,15 @@ class WPSC_REST_API {
 	private $user_id = 0;
 
 	/**
+	 * Request Errors
+	 *
+	 * @var array
+	 * @access private
+	 * @since 3.9
+	 */
+	private $errors = array();
+
+	/**
 	 * Response data to return
 	 *
 	 * @var array
@@ -190,10 +199,7 @@ class WPSC_REST_API {
 	 * @since 3.9
 	 */
 	public function missing_auth() {
-		$error['error'] = __( 'You must specify both a token and API key!', 'wpsc' );
-
-		$this->data = $error;
-		$this->output();
+		$this->errors[] = __( 'You must specify both a token and API key!', 'wpsc' );
 	}
 
 	/**
@@ -206,10 +212,7 @@ class WPSC_REST_API {
 	 * @return void
 	 */
 	function invalid_auth() {
-		$error['error'] = __( 'Your request could not be authenticated!', 'wpsc' );
-
-		$this->data = $error;
-		$this->output();
+		$this->errors[] = __( 'Your request could not be authenticated!', 'wpsc' );
 	}
 
 	/**
@@ -222,10 +225,7 @@ class WPSC_REST_API {
 	 * @return void
 	 */
 	function invalid_key() {
-		$error['error'] = __( 'Invalid API key!', 'wpsc' );
-
-		$this->data = $error;
-		$this->output();
+		$this->errors[] = __( 'Invalid API key!', 'wpsc' );
 	}
 
 
@@ -241,7 +241,7 @@ class WPSC_REST_API {
 		global $wp_query;
 
 		// Check for wpec-api var. Get out if not present
-		if ( ! isset( $wp_query->query_vars['wpec-api'] ) )
+		if ( ! isset( $wp_query->query_vars['wpsc-api'] ) )
 			return;
 
 		// Check for a valid user and set errors if necessary
@@ -302,11 +302,17 @@ class WPSC_REST_API {
 
 		endswitch;
 
+		if( ! empty( $this->errors ) ) {
+
+			// Log this API request, if enabled. We log it here because we have access to errors.
+			$this->log_request( $this->data );
+
+		} else {
+			$this->data = $this->errors;
+		}
+
 		// Allow extensions to setup their own return data
 		$this->data = apply_filters( 'wpsc_api_output_data', $data, $query_mode, $this );
-
-		// Log this API request, if enabled. We log it here because we have access to errors.
-		$this->log_request( $this->data );
 
 		// Send out data to the output function
 		$this->output();
@@ -336,10 +342,7 @@ class WPSC_REST_API {
 
 		// Make sure our query is valid
 		if ( ! in_array( $query, $accepted ) ) {
-			$error['error'] = __( 'Invalid query!', 'wpsc' );
-
-			$this->data = $error;
-			$this->output();
+			$this->errors[] = __( 'Invalid query!', 'wpsc' );
 		}
 
 		return $query;
@@ -650,8 +653,7 @@ class WPSC_REST_API {
 				$customers['customers'][0]['stats']['total_purchases'] = 0;
 				$customers['customers'][0]['stats']['total_spent']     = 0;
 			} else {
-				$error['error'] = sprintf( __( 'Customer %s not found!', 'wpsc' ), $customer );
-				return $error;
+				$this->errors[] = sprintf( __( 'Customer %s not found!', 'wpsc' ), $customer );
 			}
 		}
 
@@ -749,8 +751,7 @@ class WPSC_REST_API {
 				$products['products'][0]['notes'] = '';
 
 			} else {
-				$error['error'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $product );
-				return $error;
+				$this->errors[] = sprintf( __( 'Product %s not found!', 'wpsc' ), $product );
 			}
 		}
 
@@ -788,12 +789,12 @@ class WPSC_REST_API {
 
 					// Ensure the end date is later than the start date
 					if( $args['enddate'] < $args['startdate'] ) {
-						$error['error'] = __( 'The end date must be later than the start date!', 'wpsc' );
+						$this->errors[] = __( 'The end date must be later than the start date!', 'wpsc' );
 					}
 
 					// Ensure both the start and end date are specified
 					if ( empty( $args['startdate'] ) || empty( $args['enddate'] ) ) {
-						$error['error'] = __( 'Invalid or no date range specified!', 'wpsc' );
+						$this->errors[] = __( 'Invalid or no date range specified!', 'wpsc' );
 					}
 
 					$total = 0;
@@ -857,7 +858,7 @@ class WPSC_REST_API {
 						$product_info->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_sales_stats( $args['product'] )
 					);
 				} else {
-					$error['error'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
+					$this->errors[] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
 				}
 			}
 
@@ -879,12 +880,12 @@ class WPSC_REST_API {
 
 					// Ensure the end date is later than the start date
 					if ( $args['enddate'] < $args['startdate'] ) {
-						$error['error'] = __( 'The end date must be later than the start date!', 'wpsc' );
+						$this->errors[] = __( 'The end date must be later than the start date!', 'wpsc' );
 					}
 
 					// Ensure both the start and end date are specified
 					if ( empty( $args['startdate'] ) || empty( $args['enddate'] ) ) {
-						$error['error'] = __( 'Invalid or no date range specified!', 'wpsc' );
+						$this->errors[] = __( 'Invalid or no date range specified!', 'wpsc' );
 					}
 
 					$total = (float) 0.00;
@@ -949,7 +950,7 @@ class WPSC_REST_API {
 						$product_info->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_earnings_stats( $args['product'] )
 					);
 				} else {
-					$error['error'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
+					$this->errors[] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
 				}
 			}
 
@@ -1094,7 +1095,7 @@ class WPSC_REST_API {
 
 			} else {
 
-				$error['error'] = sprintf( __( 'Discount %s not found!', 'wpsc' ), $discount );
+				$this->errors[] = sprintf( __( 'Discount %s not found!', 'wpsc' ), $discount );
 				return $error;
 
 			}
