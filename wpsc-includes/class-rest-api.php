@@ -112,8 +112,6 @@ class WPSC_REST_API {
 		add_action( 'init',                    array( $this, 'add_endpoint'   ) );
       	add_action( 'template_redirect',       array( $this, 'process_query'  ), -1 );
 		add_filter( 'query_vars',              array( $this, 'query_vars'     ) );
-		add_action( 'show_user_profile',       array( $this, 'user_key_field' ) );
-		add_action( 'personal_options_update', array( $this, 'update_key'     ) );
 
 		// Determine if JSON_PRETTY_PRINT is available
 		$this->pretty_print = defined( 'JSON_PRETTY_PRINT' ) ? JSON_PRETTY_PRINT : null;
@@ -1252,75 +1250,5 @@ class WPSC_REST_API {
 		die();
 	}
 
-	/**
-	 * Modify User Profile
-	 *
-	 * Modifies the output of profile.php to add key generation/revocation
-	 *
-	 * @access public
-	 * @since 3.9
-	 * @global $wpsc_options Array of all the EDD Options
-	 * @param object $user Current user info
-	 * @return void
-	 */
-	function user_key_field( $user ) {
-		global $wpsc_options;
-
-		if ( ( isset( $wpsc_options['api_allow_user_keys'] ) || current_user_can( 'manage_shop_settings' ) ) && current_user_can( 'view_shop_reports' ) ) {
-			$user = get_userdata( $user->ID );
-			?>
-			<table class="form-table">
-				<tbody>
-					<tr>
-						<th>
-							<label for="wpsc_set_api_key"><?php _e( 'WP e-Commerce API Keys', 'wpsc' ); ?></label>
-						</th>
-						<td>
-							<?php if ( empty( $user->wpsc_user_public_key ) ) { ?>
-							<input name="wpsc_set_api_key" type="checkbox" id="wpsc_set_api_key" value="0" />
-							<span class="description"><?php _e( 'Generate API Key', 'wpsc' ); ?></span>
-							<?php } else { ?>
-								<strong><?php _e( 'Public key:', 'wpsc' ); ?>&nbsp;</strong><span id="publickey"><?php echo $user->wpsc_user_public_key; ?></span><br/>
-								<strong><?php _e( 'Secret key:', 'wpsc' ); ?>&nbsp;</strong><span id="privatekey"><?php echo $user->wpsc_user_secret_key; ?></span><br/>
-								<strong><?php _e( 'Token:', 'wpsc' ); ?>&nbsp;</strong><span id="token"><?php echo hash( 'md5', $user->wpsc_user_secret_key . $user->wpsc_user_public_key ); ?></span><br/>
-								<input name="wpsc_set_api_key" type="checkbox" id="wpsc_set_api_key" value="0" />
-								<span class="description"><?php _e( 'Revoke API Keys', 'wpsc' ); ?></span>
-							<?php } ?>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		<?php }
-	}
-
-	/**
-	 * Generate and Save API key
-	 *
-	 * Generates the key requested by user_key_field and stores it in the database
-	 *
-	 * @access public
-	 * @since 3.9
-	 * @param int $user_id
-	 * @return void
-	 */
-	public function update_key( $user_id ) {
-		if ( current_user_can( 'edit_user', $user_id ) && isset( $_POST['wpsc_set_api_key'] ) ) {
-			$user = get_userdata( $user_id );
-
-			if ( empty( $user->wpsc_user_public_key ) ) {
-				$public = hash( 'md5', $user->user_email . date( 'U' ) );
-				update_user_meta( $user_id, 'wpsc_user_public_key', $public );
-			} else {
-				delete_user_meta( $user_id, 'wpsc_user_public_key' );
-			}
-
-			if ( empty( $user->wpsc_user_secret_key ) ) {
-				$secret = hash( 'md5', $user->ID . date( 'U' ) );
-				update_user_meta( $user_id, 'wpsc_user_secret_key', $secret );
-			} else {
-				delete_user_meta( $user_id, 'wpsc_user_secret_key' );
-			}
-		}
-	}
 }
 add_action( 'wpsc_init', array( 'WPSC_REST_API', 'get_instance' ) );
