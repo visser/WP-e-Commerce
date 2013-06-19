@@ -262,7 +262,7 @@ class WPSC_REST_API {
 
 			case 'products' :
 
-				$product = isset( $wp_query->query_vars['product'] )   ? $wp_query->query_vars['product']   : null;
+				$product = ! empty( $wp_query->query_vars['product'] ) ? $wp_query->query_vars['product']   : null;
 
 				$data = $this->get_products( $product );
 
@@ -270,7 +270,7 @@ class WPSC_REST_API {
 
 			case 'customers' :
 
-				$customer = isset( $wp_query->query_vars['customer'] ) ? $wp_query->query_vars['customer']  : null;
+				$customer = ! empty( $wp_query->query_vars['customer'] ) ? $wp_query->query_vars['customer']  : null;
 
 				$data = $this->get_customers( $customer );
 
@@ -284,7 +284,7 @@ class WPSC_REST_API {
 
 			case 'coupons' :
 
-				$coupon = isset( $wp_query->query_vars['coupon'] ) ? $wp_query->query_vars['coupon']  : null;
+				$coupon = ! empty( $wp_query->query_vars['coupon'] ) ? $wp_query->query_vars['coupon']  : null;
 
 				$data = $this->get_coupons( $coupon );
 
@@ -294,11 +294,11 @@ class WPSC_REST_API {
 			default :
 
 				$data = $this->get_stats( array(
-					'type'      => isset( $wp_query->query_vars['type'] )      ? $wp_query->query_vars['type']      : null,
-					'product'   => isset( $wp_query->query_vars['product'] )   ? $wp_query->query_vars['product']   : null,
-					'date'      => isset( $wp_query->query_vars['date'] )      ? $wp_query->query_vars['date']      : null,
-					'startdate' => isset( $wp_query->query_vars['startdate'] ) ? $wp_query->query_vars['startdate'] : null,
-					'enddate'   => isset( $wp_query->query_vars['enddate'] )   ? $wp_query->query_vars['enddate']   : null
+					'type'      => ! empty( $wp_query->query_vars['type'] )      ? $wp_query->query_vars['type']      : null,
+					'product'   => ! empty( $wp_query->query_vars['product'] )   ? $wp_query->query_vars['product']   : null,
+					'date'      => ! empty( $wp_query->query_vars['date'] )      ? $wp_query->query_vars['date']      : null,
+					'startdate' => ! empty( $wp_query->query_vars['startdate'] ) ? $wp_query->query_vars['startdate'] : null,
+					'enddate'   => ! empty( $wp_query->query_vars['enddate'] )   ? $wp_query->query_vars['enddate']   : null
 				) );
 
 				break;
@@ -759,6 +759,7 @@ class WPSC_REST_API {
 		}
 
 		return $products;
+
 	}
 
 	/**
