@@ -673,71 +673,82 @@ class WPSC_REST_API {
 	 * @return array $customers Multidimensional array of the products
 	 */
 	public function get_products( $product = null ) {
+
 		$products = array();
+		$products['products'] = array();
 
-		if ( $product == null ) {
-			$products['products'] = array();
+		if( ! empty( $product ) ) {
 
-			$product_list = get_posts( array(
+			$p = get_post( $product );
+
+			// No product found
+			if( ! $p ) {
+
+				$this->errors['no_product'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $product );
+
+			} elseif( 'wpsc-product' != $p->post_type ) {
+
+				$this->errors['no_product'] = sprintf( __( 'Specified ID is not a WP e-Commerce product!', 'wpsc' ), $product );
+
+			} else {
+
+				$product_query = array(
+					0 => $p
+				);
+
+			}
+
+		} else {
+
+			$product_query = get_posts( array(
 				'post_type'      => 'wpsc-product',
 				'posts_per_page' => $this->per_page(),
 				'paged'          => $this->get_paged()
 			) );
 
-			if ( $product_list ) {
-				$i = 0;
-				foreach ( $product_list as $product_info ) {
-					$products['products'][$i]['info']['id']                           = $product_info->ID;
-					$products['products'][$i]['info']['slug']                         = $product_info->post_name;
-					$products['products'][$i]['info']['title']                        = $product_info->post_title;
-					$products['products'][$i]['info']['create_date']                  = $product_info->post_date;
-					$products['products'][$i]['info']['modified_date']                = $product_info->post_modified;
-					$products['products'][$i]['info']['status']                       = $product_info->post_status;
-					$products['products'][$i]['info']['link']                         = html_entity_decode( $product_info->guid );
-					$products['products'][$i]['info']['content']                      = $product_info->post_content;
-					$products['products'][$i]['info']['thumbnail']                    = wp_get_attachment_url( get_post_thumbnail_id( $product_info->ID ) );
-
-					$products['products'][$i]['stats']['total']['sales']              = 0;
-					$products['products'][$i]['stats']['total']['earnings']           = 0;
-					$products['products'][$i]['stats']['monthly_average']['sales']    = 0;
-					$products['products'][$i]['stats']['monthly_average']['earnings'] = 0;
-
-					/*
-					 * TODO
-					 *
-					 * Do something with variations here
-					 */
-
-
-					/*
-					 * TODO
-					 *
-					 * Retrieve products notes here, if relevant
-					 */
-
-					$products['products'][$i]['notes'] = '';
-					$i++;
-				}
+			if( ! $product_query ) {
+				$this->errors['no_products'] = __( 'No products found!', 'wpsc' );
 			}
-		} else {
-			if ( get_post_type( $product ) == 'wpsc-product' ) {
 
-				$product_info = get_post( $product );
+		}
 
-				$products['products'][0]['info']['id']                           = $product_info->ID;
-				$products['products'][0]['info']['slug']                         = $product_info->post_name;
-				$products['products'][0]['info']['title']                        = $product_info->post_title;
-				$products['products'][0]['info']['create_date']                  = $product_info->post_date;
-				$products['products'][0]['info']['modified_date']                = $product_info->post_modified;
-				$products['products'][0]['info']['status']                       = $product_info->post_status;
-				$products['products'][0]['info']['link']                         = html_entity_decode( $product_info->guid );
-				$products['products'][0]['info']['content']                      = $product_info->post_content;
-				$products['products'][0]['info']['thumbnail']                    = wp_get_attachment_url( get_post_thumbnail_id( $product_info->ID ) );
 
-				$products['products'][0]['stats']['total']['sales']              = wpsc_get_download_sales_stats( $product_info->ID );
-				$products['products'][0]['stats']['total']['earnings']           = wpsc_get_download_earnings_stats( $product_info->ID );
-				$products['products'][0]['stats']['monthly_average']['sales']    = wpsc_get_average_monthly_download_sales( $product_info->ID );
-				$products['products'][0]['stats']['monthly_average']['earnings'] = wpsc_get_average_monthly_download_earnings( $product_info->ID );
+		if ( empty( $this->errors ) ) {
+
+			$i = 0;
+
+			foreach ( $product_query as $product_info ) {
+
+				$products['products'][$i]['info']['id']                           = $product_info->ID;
+				$products['products'][$i]['info']['slug']                         = $product_info->post_name;
+				$products['products'][$i]['info']['title']                        = $product_info->post_title;
+				$products['products'][$i]['info']['create_date']                  = $product_info->post_date;
+				$products['products'][$i]['info']['modified_date']                = $product_info->post_modified;
+				$products['products'][$i]['info']['status']                       = $product_info->post_status;
+				$products['products'][$i]['info']['link']                         = html_entity_decode( $product_info->guid );
+				$products['products'][$i]['info']['description']                  = $product_info->post_content;
+				$products['products'][$i]['info']['additional_description']       = $product_info->post_content;
+				$products['products'][$i]['info']['thumbnail']                    = wp_get_attachment_url( get_post_thumbnail_id( $product_info->ID ) );
+				$products['products'][$i]['info']['tags']                         = array();
+				$products['products'][$i]['info']['categories']                   = array();
+				$products['products'][$i]['stats']['total']['stock']              = 0;
+				$products['products'][$i]['stats']['total']['sku']                = 0;
+				$products['products'][$i]['stats']['total']['taxable_amount']     = 0;
+				$products['products'][$i]['stats']['total']['external_link']      = array(
+					'url'    => '',
+					'text'   => '',
+					'target' => ''
+				);
+				$products['products'][$i]['stats']['total']['earnings']           = 0;
+				$products['products'][$i]['stats']['monthly_average']['sales']    = 0;
+				$products['products'][$i]['stats']['monthly_average']['earnings'] = 0;
+
+				$products['products'][$i]['info']['featured_image']               = wp_get_attachment_url( get_post_thumbnail_id( $product_info->ID ) );
+				/*
+				 * TODO
+				 *
+				 * Do something with product images here
+				 */
 
 				/*
 				 * TODO
@@ -749,13 +760,24 @@ class WPSC_REST_API {
 				/*
 				 * TODO
 				 *
-				 * Retrieve products notes here, if relevant
+				 * Do something with file downloads here
 				 */
 
-				$products['products'][0]['notes'] = '';
+				/*
+				 * TODO
+				 *
+				 * Retrieve products notes here, if relevant
+				 */
+				$products['products'][$i]['notes'] = '';
 
-			} else {
-				$this->errors['no_product'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $product );
+
+				/*
+				 * TODO
+				 *
+				 * Retrieve custom meta fields here
+				 */
+
+				$i++;
 			}
 		}
 
