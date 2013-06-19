@@ -1141,7 +1141,7 @@ class WPSC_REST_API {
 		);
 
 		$log_meta = array(
-			'request_ip' => wpsc_get_ip(),
+			'request_ip' => '', // TODO get the IP of the API request
 			'user'       => $this->user_id,
 			'key'        => $wp_query->query_vars['key']
 		);
