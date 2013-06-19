@@ -63,7 +63,7 @@ class WPSC_REST_API {
 	 * @access private
 	 * @since 3.9
 	 */
-	private $is_valid_request = false;
+	private $is_valid_request = true; // TODO - set to false once testing without keys is finished
 
 	/**
 	 * User ID Performing the API Request
@@ -173,6 +173,8 @@ class WPSC_REST_API {
 	 */
 	private function validate_request() {
 		global $wp_query;
+
+		return; // TODO - remove once actual keys are implemented
 
 		// Make sure we have both user and api key
 		if ( empty( $wp_query->query_vars['token'] ) || empty( $wp_query->query_vars['key'] ) )
