@@ -719,20 +719,20 @@ class WPSC_REST_API {
 
 			$i = 0;
 
-			foreach ( $product_query as $product_info ) {
+			foreach ( $product_query as $p_object ) {
 
-				$products['products'][$i]['info']['id']                           = $product_info->ID;
-				$products['products'][$i]['info']['slug']                         = $product_info->post_name;
-				$products['products'][$i]['info']['title']                        = $product_info->post_title;
-				$products['products'][$i]['info']['create_date']                  = $product_info->post_date;
-				$products['products'][$i]['info']['modified_date']                = $product_info->post_modified;
-				$products['products'][$i]['info']['status']                       = $product_info->post_status;
-				$products['products'][$i]['info']['link']                         = html_entity_decode( $product_info->guid );
-				$products['products'][$i]['info']['description']                  = $product_info->post_content;
-				$products['products'][$i]['info']['additional_description']       = $product_info->post_content;
-				$products['products'][$i]['info']['thumbnail']                    = wp_get_attachment_url( get_post_thumbnail_id( $product_info->ID ) );
-				$products['products'][$i]['info']['tags']                         = wp_get_product_tags( $product_info->ID );
-				$products['products'][$i]['info']['categories']                   = wp_get_product_categories( $product_info->ID );
+				$products['products'][$i]['info']['id']                           = $p_object->ID;
+				$products['products'][$i]['info']['slug']                         = $p_object->post_name;
+				$products['products'][$i]['info']['title']                        = $p_object->post_title;
+				$products['products'][$i]['info']['create_date']                  = $p_object->post_date;
+				$products['products'][$i]['info']['modified_date']                = $p_object->post_modified;
+				$products['products'][$i]['info']['status']                       = $p_object->post_status;
+				$products['products'][$i]['info']['link']                         = html_entity_decode( $p_object->guid );
+				$products['products'][$i]['info']['description']                  = $p_object->post_content;
+				$products['products'][$i]['info']['additional_description']       = $p_object->post_content;
+				$products['products'][$i]['info']['thumbnail']                    = wp_get_attachment_url( get_post_thumbnail_id( $p_object->ID ) );
+				$products['products'][$i]['info']['tags']                         = wp_get_product_tags( $p_object->ID );
+				$products['products'][$i]['info']['categories']                   = wp_get_product_categories( $p_object->ID );
 				$products['products'][$i]['info']['stock']                        = 0;
 				$products['products'][$i]['info']['sku']                          = 0;
 				$products['products'][$i]['info']['taxable_amount']               = 0;
@@ -742,7 +742,7 @@ class WPSC_REST_API {
 					'target' => ''
 				);
 
-				$products['products'][$i]['info']['featured_image']               = wp_get_attachment_url( get_post_thumbnail_id( $product_info->ID ) );
+				$products['products'][$i]['info']['featured_image']               = wp_get_attachment_url( get_post_thumbnail_id( $p_object->ID ) );
 				/*
 				 * TODO
 				 *
@@ -876,17 +876,17 @@ class WPSC_REST_API {
 			} elseif ( $args['product'] == 'all' ) {
 				$products = get_posts( array( 'post_type' => 'wpsc-product', 'nopaging' => true ) );
 				$i = 0;
-				foreach ( $products as $product_info ) {
+				foreach ( $products as $p_object ) {
 					$sales['sales'][$i] = array(
-						$product_info->post_name => 0 // TODO - get sales by date, something like wpsc_get_product_sales_stats( $args['product'] )
+						$p_object->post_name => 0 // TODO - get sales by date, something like wpsc_get_product_sales_stats( $args['product'] )
 					);
 					$i++;
 				}
 			} else {
 				if ( get_post_type( $args['product'] ) == 'wpsc-product' ) {
-					$product_info = get_post( $args['product'] );
+					$p_object = get_post( $args['product'] );
 					$sales['sales'][0] = array(
-						$product_info->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_sales_stats( $args['product'] )
+						$p_object->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_sales_stats( $args['product'] )
 					);
 				} else {
 					$this->errors['no_product'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
@@ -968,17 +968,17 @@ class WPSC_REST_API {
 				$products = get_posts( array( 'post_type' => 'download', 'nopaging' => true ) );
 
 				$i = 0;
-				foreach ( $products as $product_info ) {
+				foreach ( $products as $p_object ) {
 					$earnings['earnings'][ $i ] = array(
-						$product_info->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_earnings_stats( $args['product'] )
+						$p_object->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_earnings_stats( $args['product'] )
 					);
 					$i++;
 				}
 			} else {
 				if ( get_post_type( $args['product'] ) == 'download' ) {
-					$product_info = get_post( $args['product'] );
+					$p_object = get_post( $args['product'] );
 					$earnings['earnings'][0] = array(
-						$product_info->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_earnings_stats( $args['product'] )
+						$p_object->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_earnings_stats( $args['product'] )
 					);
 				} else {
 					$this->errors['no_product'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
