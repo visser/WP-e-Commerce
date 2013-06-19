@@ -201,7 +201,7 @@ class WPSC_REST_API {
 	 * @since 3.9
 	 */
 	public function missing_auth() {
-		$this->errors[] = __( 'You must specify both a token and API key!', 'wpsc' );
+		$this->errors['missing_keys'] = __( 'You must specify both a token and API key!', 'wpsc' );
 	}
 
 	/**
@@ -214,7 +214,7 @@ class WPSC_REST_API {
 	 * @return void
 	 */
 	function invalid_auth() {
-		$this->errors[] = __( 'Your request could not be authenticated!', 'wpsc' );
+		$this->errors['not_authenticated'] = __( 'Your request could not be authenticated!', 'wpsc' );
 	}
 
 	/**
@@ -227,7 +227,7 @@ class WPSC_REST_API {
 	 * @return void
 	 */
 	function invalid_key() {
-		$this->errors[] = __( 'Invalid API key!', 'wpsc' );
+		$this->errors['invalid_api_key'] = __( 'Invalid API key!', 'wpsc' );
 	}
 
 
@@ -345,7 +345,7 @@ class WPSC_REST_API {
 
 		// Make sure our query is valid
 		if ( ! in_array( $query, $accepted ) ) {
-			$this->errors[] = __( 'Invalid query!', 'wpsc' );
+			$this->errors['invalid_query'] = __( 'Invalid query!', 'wpsc' );
 		}
 
 		return $query;
@@ -656,7 +656,7 @@ class WPSC_REST_API {
 				$customers['customers'][0]['stats']['total_purchases'] = 0;
 				$customers['customers'][0]['stats']['total_spent']     = 0;
 			} else {
-				$this->errors[] = sprintf( __( 'Customer %s not found!', 'wpsc' ), $customer );
+				$this->errors['no_customer'] = sprintf( __( 'Customer %s not found!', 'wpsc' ), $customer );
 			}
 		}
 
@@ -754,7 +754,7 @@ class WPSC_REST_API {
 				$products['products'][0]['notes'] = '';
 
 			} else {
-				$this->errors[] = sprintf( __( 'Product %s not found!', 'wpsc' ), $product );
+				$this->errors['no_product'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $product );
 			}
 		}
 
@@ -792,12 +792,12 @@ class WPSC_REST_API {
 
 					// Ensure the end date is later than the start date
 					if( $args['enddate'] < $args['startdate'] ) {
-						$this->errors[] = __( 'The end date must be later than the start date!', 'wpsc' );
+						$this->errors['invalid_end_date'] = __( 'The end date must be later than the start date!', 'wpsc' );
 					}
 
 					// Ensure both the start and end date are specified
 					if ( empty( $args['startdate'] ) || empty( $args['enddate'] ) ) {
-						$this->errors[] = __( 'Invalid or no date range specified!', 'wpsc' );
+						$this->errors['invalid_date_range'] = __( 'Invalid or no date range specified!', 'wpsc' );
 					}
 
 					$total = 0;
@@ -861,7 +861,7 @@ class WPSC_REST_API {
 						$product_info->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_sales_stats( $args['product'] )
 					);
 				} else {
-					$this->errors[] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
+					$this->errors['no_product'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
 				}
 			}
 
@@ -883,12 +883,12 @@ class WPSC_REST_API {
 
 					// Ensure the end date is later than the start date
 					if ( $args['enddate'] < $args['startdate'] ) {
-						$this->errors[] = __( 'The end date must be later than the start date!', 'wpsc' );
+						$this->errors['invalid_end_date'] = __( 'The end date must be later than the start date!', 'wpsc' );
 					}
 
 					// Ensure both the start and end date are specified
 					if ( empty( $args['startdate'] ) || empty( $args['enddate'] ) ) {
-						$this->errors[] = __( 'Invalid or no date range specified!', 'wpsc' );
+						$this->errors['invalid_date_range'] = __( 'Invalid or no date range specified!', 'wpsc' );
 					}
 
 					$total = (float) 0.00;
@@ -953,7 +953,7 @@ class WPSC_REST_API {
 						$product_info->post_name => 0 // TODO get sale stats for product, something like wpsc_get_product_earnings_stats( $args['product'] )
 					);
 				} else {
-					$this->errors[] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
+					$this->errors['no_product'] = sprintf( __( 'Product %s not found!', 'wpsc' ), $args['product'] );
 				}
 			}
 
@@ -1098,7 +1098,7 @@ class WPSC_REST_API {
 
 			} else {
 
-				$this->errors[] = sprintf( __( 'coupon %s not found!', 'wpsc' ), $coupon );
+				$this->errors['no_coupon'] = sprintf( __( 'coupon %s not found!', 'wpsc' ), $coupon );
 				return $error;
 
 			}
