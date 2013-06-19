@@ -721,6 +721,8 @@ class WPSC_REST_API {
 
 			foreach ( $product_query as $p_object ) {
 
+				$custom = get_post_custom( $p_object->ID );
+
 				$products['products'][$i]['info']['id']                           = $p_object->ID;
 				$products['products'][$i]['info']['slug']                         = $p_object->post_name;
 				$products['products'][$i]['info']['title']                        = $p_object->post_title;
@@ -737,9 +739,9 @@ class WPSC_REST_API {
 				$products['products'][$i]['info']['sku']                          = 0;
 				$products['products'][$i]['info']['taxable_amount']               = 0;
 				$products['products'][$i]['info']['external_link']                = array(
-					'url'    => '',
-					'text'   => '',
-					'target' => ''
+					'url'    => ! empty( $custom['external_link']        ) ? maybe_unserialize( $custom['external_link']        ) : '',
+					'text'   => ! empty( $custom['external_link_text']   ) ? maybe_unserialize( $custom['external_link_text']   ) : '',
+					'target' => ! empty( $custom['external_link_target'] ) ? maybe_unserialize( $custom['external_link_target'] ) : ''
 				);
 
 				$products['products'][$i]['info']['featured_image']               = wp_get_attachment_url( get_post_thumbnail_id( $p_object->ID ) );
