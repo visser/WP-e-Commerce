@@ -1162,6 +1162,12 @@ class WPSC_REST_API {
 	 * @return array
 	 */
 	public function get_output() {
+		if( ! empty( $this->errors ) ) {
+			$this->data = array();
+			foreach( $this->errors as $error ) {
+				$this->data['errors'][] = $error;
+			}
+		}
 		return $this->data;
 	}
 
@@ -1179,7 +1185,7 @@ class WPSC_REST_API {
 	public function output() {
 		global $wp_query;
 
-		$data = $this->data;
+		$data = $this->get_output();
 
 		$format = $this->get_output_format();
 
