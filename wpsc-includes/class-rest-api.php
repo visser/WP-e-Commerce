@@ -398,7 +398,7 @@ class WPSC_REST_API {
 	private function get_output_format() {
 		global $wp_query;
 
-		$format = isset( $wp_query->query_vars['format'] ) ? $wp_query->query_vars['format'] : 'json';
+		$format = ! empty( $wp_query->query_vars['format'] ) ? $wp_query->query_vars['format'] : 'json';
 
 		return apply_filters( 'wpsc_api_output_format', $format );
 	}
