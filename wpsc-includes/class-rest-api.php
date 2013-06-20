@@ -182,7 +182,7 @@ class WPSC_REST_API {
 		global $wp_query;
 
 
-		// Make sure we have both user and api key
+		// Make sure we have both api key and token
 		if ( empty( $wp_query->query_vars['token'] ) || empty( $wp_query->query_vars['key'] ) )
 			$this->missing_auth();
 
