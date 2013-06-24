@@ -774,6 +774,11 @@ class WPSC_REST_API {
 				 */
 
 
+				/*
+				 * TODO
+				 *
+				 * Retrieve earnings / sales stats here
+				 */
 				$products['products'][$i]['stats']['total']['earnings']           = 0;
 				$products['products'][$i]['stats']['monthly_average']['sales']    = 0;
 				$products['products'][$i]['stats']['monthly_average']['earnings'] = 0;
