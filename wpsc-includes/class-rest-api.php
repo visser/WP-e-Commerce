@@ -735,8 +735,8 @@ class WPSC_REST_API {
 				$products['products'][$i]['info']['thumbnail']                    = wp_get_attachment_url( get_post_thumbnail_id( $p_object->ID ) );
 				$products['products'][$i]['info']['tags']                         = wp_get_product_tags( $p_object->ID );
 				$products['products'][$i]['info']['categories']                   = wp_get_product_categories( $p_object->ID );
-				$products['products'][$i]['info']['stock']                        = 0;
-				$products['products'][$i]['info']['sku']                          = 0;
+				$products['products'][$i]['info']['stock']                        = $p_object->_wpsc_stock;
+				$products['products'][$i]['info']['sku']                          = $p_object->_wpsc_sku;
 				$products['products'][$i]['info']['taxable_amount']               = 0;
 				$products['products'][$i]['info']['external_link']                = array(
 					'url'    => ! empty( $custom['external_link']        ) ? maybe_unserialize( $custom['external_link']        ) : '',
