@@ -742,11 +742,22 @@ class WPSC_REST_API {
 				$products['products'][$i]['info']['sku']                          = $p_object->_wpsc_sku;
 				$products['products'][$i]['info']['metadata']                     = $product_metadata;
 				$products['products'][$i]['info']['featured_image']               = wp_get_attachment_url( get_post_thumbnail_id( $p_object->ID ) );
-				/*
-				 * TODO
-				 *
-				 * Do something with product images here
-				 */
+
+				$product_images      = array();
+				$images              = get_posts( array(
+					'post_type'      => 'attachment',
+					'post_mime_type' => 'image',
+					'nopaging'       => true,
+					'post_parent'    => $p_object->ID,
+					'fields'         => 'ids'
+				) );
+				if( $images ) {
+					foreach( $images as $image ) {
+						$src = wp_get_attachment_image_src( $image, 'thumbnail' );
+						$product_images[] = $src[0];
+					}
+				}
+				$products['products'][$i]['info']['product_images']               = $product_images;
 
 				/*
 				 * TODO
