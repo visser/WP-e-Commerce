@@ -772,12 +772,6 @@ class WPSC_REST_API {
 				 * Do something with file downloads here
 				 */
 
-				/*
-				 * TODO
-				 *
-				 * Retrieve custom meta fields here
-				 */
-
 				$custom_fields = $wpdb->get_results( "
 					SELECT
 						`meta_id`, `meta_key`, `meta_value`
