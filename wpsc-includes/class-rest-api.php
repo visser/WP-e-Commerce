@@ -674,6 +674,8 @@ class WPSC_REST_API {
 	 */
 	public function get_products( $product = null ) {
 
+		global $wpdb;
+
 		$products = array();
 		$products['products'] = array();
 
@@ -723,7 +725,7 @@ class WPSC_REST_API {
 
 				$custom = get_post_custom( $p_object->ID );
 				$product_metadata = ! empty( $custom['_wpsc_product_metadata'] ) ? maybe_unserialize( $custom['_wpsc_product_metadata'][0] ) : false;
-				//echo '<pre>'; print_r( $product_metadata ); echo '</pre>'; exit;
+				//echo '<pre>'; print_r( $custom ); echo '</pre>'; exit;
 				$products['products'][$i]['info']['id']                           = $p_object->ID;
 				$products['products'][$i]['info']['slug']                         = $p_object->post_name;
 				$products['products'][$i]['info']['title']                        = $p_object->post_title;
@@ -762,17 +764,22 @@ class WPSC_REST_API {
 				/*
 				 * TODO
 				 *
-				 * Retrieve products notes here, if relevant
-				 */
-				$products['products'][$i]['notes'] = '';
-
-
-				/*
-				 * TODO
-				 *
 				 * Retrieve custom meta fields here
 				 */
 
+				$custom_fields = $wpdb->get_results( "
+					SELECT
+						`meta_id`, `meta_key`, `meta_value`
+					FROM
+						`{$wpdb->postmeta}`
+					WHERE
+						`post_id` = {$p_object->ID}
+					AND
+						`meta_key` NOT LIKE '\_%'
+					ORDER BY
+						LOWER(meta_key)", ARRAY_A
+				);
+				$products['products'][$i]['info']['custom_fields'] = $custom_fields;
 
 				/*
 				 * TODO
