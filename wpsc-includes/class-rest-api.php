@@ -1223,14 +1223,6 @@ class WPSC_REST_API {
 
 		switch( $format ) :
 
-			case 'xml' :
-
-				require_once WPSC_FILE_PATH . '/wpsc-includes/array2xml.php';
-				$xml = Array2XML::createXML( 'wpsc', $data );
-				echo $xml->saveXML();
-
-				break;
-
 			case 'json' :
 
 				header( 'Content-Type: application/json' );
