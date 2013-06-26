@@ -759,19 +759,35 @@ class WPSC_REST_API {
 				}
 				$products['products'][$i]['info']['product_images']               = $product_images;
 
+
 				/*
 				 * TODO
 				 *
 				 * Do something with variations here
 				 */
+				$products['products'][$i]['info']['variations']                   = array();
 
 
-				/*
-				 * TODO
-				 *
-				 * Do something with file downloads here
-				 */
+				// Retrieve product files
+				$file_args = array(
+					'post_type'   => 'wpsc-product-file',
+					'post_parent' => $p_object->ID,
+					'numberposts' => -1,
+					'post_status' => 'all'
+				);
+				$product_files = (array)get_posts( $file_args );
+				$products['products'][$i]['info']['files']                        = array();
+				foreach ( (array) $product_files as $file ) {
 
+					$products['products'][$i]['info']['files'][] = array(
+						'name' => $file->post_title,
+						'type' => wpsc_get_extension( $file->post_title )
+					);
+
+				}
+
+
+				// Retrieve custom product meta
 				$custom_fields = $wpdb->get_results( "
 					SELECT
 						`meta_id`, `meta_key`, `meta_value`
