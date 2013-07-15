@@ -202,6 +202,7 @@ class WPSC_REST_API {
 	 */
 	public function missing_auth() {
 		$this->errors['missing_keys'] = __( 'You must specify both a token and API key!', 'wpsc' );
+		$this->output( 401 );
 	}
 
 	/**
@@ -215,6 +216,7 @@ class WPSC_REST_API {
 	 */
 	function invalid_auth() {
 		$this->errors['not_authenticated'] = __( 'Your request could not be authenticated!', 'wpsc' );
+		$this->output( 401 );
 	}
 
 	/**
@@ -228,6 +230,7 @@ class WPSC_REST_API {
 	 */
 	function invalid_key() {
 		$this->errors['invalid_api_key'] = __( 'Invalid API key!', 'wpsc' );
+		$this->output( 401 );
 	}
 
 
@@ -1240,12 +1243,14 @@ class WPSC_REST_API {
 	 * @param array $data
 	 * @return void
 	 */
-	public function output() {
+	public function output( $status_code = 200 ) {
 		global $wp_query;
 
 		$data = $this->get_output();
 
 		$format = $this->get_output_format();
+
+		status_header( $status_code );
 
 		do_action( 'wpsc_api_output_before', $data, $this, $format );
 
