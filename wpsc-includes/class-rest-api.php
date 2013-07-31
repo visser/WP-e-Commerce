@@ -1117,7 +1117,7 @@ class WPSC_REST_API {
 
 			$paged     = $this->get_paged();
 			$per_page  = $this->per_page();
-			$coupons = array(); // TODO - get coupon codes
+			$coupons   = array();
 			$count     = 0;
 
 			foreach ( $coupons as $coupon ) {
