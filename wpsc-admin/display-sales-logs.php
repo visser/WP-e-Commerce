@@ -162,31 +162,29 @@ class WPSC_Purchase_Log_Page {
 
 		if ( ! empty( $purchlogitem->additional_fields ) ) {
 		?>
-			<div class="metabox-holder">
-				<div id="custom_checkout_fields" class="postbox">
-					<h3 class='hndle'><?php esc_html_e( 'Additional Checkout Fields' , 'wpsc' ); ?></h3>
-					<div class='inside'>
-						<?php
-						foreach( (array) $purchlogitem->additional_fields as $value ) {
-							$value['value'] = maybe_unserialize ( $value['value'] );
-							if ( is_array( $value['value'] ) ) {
-								?>
-									<p><strong><?php echo $value['name']; ?> :</strong> <?php echo implode( stripslashes( $value['value'] ), ',' ); ?></p>
-								<?php
-							} else {
-								$thevalue = esc_html( stripslashes( $value['value'] ));
-								if ( empty( $thevalue ) ) {
-									$thevalue = __( '<em>blank</em>', 'wpsc' );
-								}
-								?>
-									<p><strong><?php echo $value['name']; ?> :</strong> <?php echo $thevalue; ?></p>
-								<?php
-							}
-						}
-						?>
-					</div>
-				</div>
-			</div>
+<div id="custom_checkout_fields" class="postbox">
+	<h3 class='hndle'><?php esc_html_e( 'Additional Checkout Fields' , 'wpsc' ); ?></h3>
+	<div class='inside'>
+		<?php
+		foreach( (array) $purchlogitem->additional_fields as $value ) {
+			$value['value'] = maybe_unserialize ( $value['value'] );
+			if ( is_array( $value['value'] ) ) {
+				?>
+					<p><strong><?php echo $value['name']; ?> :</strong> <?php echo implode( stripslashes( $value['value'] ), ',' ); ?></p>
+				<?php
+			} else {
+				$thevalue = esc_html( stripslashes( $value['value'] ));
+				if ( empty( $thevalue ) ) {
+					$thevalue = __( '<em>blank</em>', 'wpsc' );
+				}
+				?>
+					<p><strong><?php echo $value['name']; ?> :</strong> <?php echo $thevalue; ?></p>
+				<?php
+			}
+		}
+		?>
+	</div>
+</div>
 		<?php
 		}
 	}
